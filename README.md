@@ -1,75 +1,151 @@
-# React + TypeScript + Vite
+# Expense Tracker
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A responsive expense tracker application built with React, TypeScript, and Vite.
 
-Currently, two official plugins are available:
+The application allows users to add and view expenses, calculate total spending, load initial data from a mock API, and persist expenses in the browser using local storage.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Features
 
-## React Compiler
+- Add expenses with a description, amount, category, and date
+- Display expenses in a responsive list
+- Calculate total expenses and transaction count
+- Load initial expenses from a local mock API
+- Persist expenses in `localStorage`
+- Restore expenses after page refresh
+- Automatic focus on the description field after submitting a new expense
+- Loading and error states
+- Responsive layout for desktop and mobile devices
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## React Concepts
 
-## Expanding the ESLint configuration
+This project demonstrates the following React hooks:
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- `useState` — manages form inputs, expenses, loading state, and error state
+- `useEffect` — loads initial expenses and synchronizes expense data with local storage
+- `useRef` — manages focus for the description input
+- `useMemo` — calculates the total expense amount
+- `useCallback` — memoizes the expense creation handler
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Tech Stack
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+- React
+- TypeScript
+- Vite
+- CSS
+- ESLint
+- Prettier
+- Browser `localStorage`
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Project Structure
 
+```text
+src/
+├── api/
+│   └── expenses.ts
+├── components/
+│   ├── ExpenseForm/
+│   │   └── ExpenseForm.tsx
+│   ├── ExpenseItem/
+│   │   └── ExpenseItem.tsx
+│   ├── ExpenseList/
+│   │   └── ExpenseList.tsx
+│   └── ExpenseSummary/
+│       └── ExpenseSummary.tsx
+├── types/
+│   └── expense.ts
+├── utils/
+│   └── storage.ts
+├── App.css
+├── App.tsx
+├── index.css
+└── main.tsx
+````
+
+## Getting Started
+
+### Prerequisites
+
+* Node.js
+* npm
+
+### Installation
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/mykytapilec/expense-tracker-web.git
+cd expense-tracker-web
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Start the development server:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm run dev
 ```
+
+The application will be available at the local URL provided by Vite.
+
+### Linting
+
+Run ESLint:
+
+```bash
+npm run lint
+```
+
+### Production Build
+
+Create a production build:
+
+```bash
+npm run build
+```
+
+## Data Persistence
+
+Initial expenses are provided by a local mock API.
+
+After the data is loaded, expenses are stored in the browser's `localStorage`. New expenses are also persisted automatically, so they remain available after refreshing the page.
+
+The stored data belongs to the current browser and is not synchronized with a remote backend.
+
+## Mock API
+
+The project uses a local mock API instead of a real backend.
+
+The mock API simulates asynchronous data loading and provides the initial expense data used by the application.
+
+## Development Workflow
+
+The project follows a feature-branch Git workflow:
+
+```text
+main
+  └── dev
+       ├── feature/project-setup
+       ├── feature/expense-form
+       ├── feature/expense-list
+       ├── feature/mock-api
+       ├── feature/expense-summary
+       ├── feature/use-callback
+       ├── feature/project-polish
+       ├── feature/local-storage
+       └── feature/project-documentation
+```
+
+Feature branches are created from `dev` and merged back through pull requests.
+
+## Project Requirements
+
+This project was created to practice:
+
+* React state management with `useState`
+* Asynchronous data loading with `useEffect`
+* DOM references with `useRef`
+* Performance optimization with `useMemo`
+* Callback memoization with `useCallback`
+* TypeScript type safety
+* Responsive UI development
