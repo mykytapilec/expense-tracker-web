@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchExpenses } from './api/expenses';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
@@ -26,9 +26,9 @@ function App() {
     loadExpenses();
   }, []);
 
-  const handleAddExpense = (expense: Expense) => {
+  const handleAddExpense = useCallback((expense: Expense) => {
     setExpenses((currentExpenses) => [...currentExpenses, expense]);
-  };
+  }, []);
 
   return (
     <main className="app">
