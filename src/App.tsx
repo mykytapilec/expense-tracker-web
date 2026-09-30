@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchExpenses } from './api/expenses';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
+import { ExpenseSummary } from './components/ExpenseSummary/ExpenseSummary';
 import type { Expense } from './types/expense';
 import './App.css';
 
@@ -44,7 +45,12 @@ function App() {
 
         {isLoading && <p>Loading expenses...</p>}
         {error && <p>{error}</p>}
-        {!isLoading && !error && <ExpenseList expenses={expenses} />}
+        {!isLoading && !error && (
+          <>
+            <ExpenseSummary expenses={expenses} />
+            <ExpenseList expenses={expenses} />
+          </>
+        )}
       </section>
     </main>
   );
