@@ -1,63 +1,121 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchExpenses } from './api/expenses';
+
+import { getToken, removeToken } from './api/auth';
+import { createExpense, fetchExpenses } from './api/expenses';
+import { Auth } from './components/Auth/Auth';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
 import { ExpenseSummary } from './components/ExpenseSummary/ExpenseSummary';
-import { getStoredExpenses, saveExpenses } from './utils/storage';
 import type { Expense } from './types/expense';
 import './App.css';
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(
+    () => getToken() !== null,
+  );
+  const [userEmail, setUserEmail] = useState('');
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(() => getToken() !== null);
+  const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
+    if (!isAuthenticated) {
+      return;
+    }
+
     const loadExpenses = async () => {
-      const storedExpenses = getStoredExpenses();
-
-      if (storedExpenses) {
-        setExpenses(storedExpenses);
-        setIsLoading(false);
-        return;
-      }
-
       try {
         const data = await fetchExpenses();
         setExpenses(data);
-        saveExpenses(data);
-      } catch {
-        setError('Failed to load expenses.');
+      } catch (requestError) {
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'Failed to load expenses.',
+        );
       } finally {
         setIsLoading(false);
       }
     };
 
     loadExpenses();
+  }, [isAuthenticated]);
+
+  const handleAuthenticated = useCallback((email: string) => {
+    setUserEmail(email);
+    setIsAuthenticated(true);
+    setIsLoading(true);
+    setError('');
   }, []);
 
-  useEffect(() => {
-    if (!isLoading) {
-      saveExpenses(expenses);
+  const handleLogout = useCallback(() => {
+    removeToken();
+    setIsAuthenticated(false);
+    setUserEmail('');
+    setExpenses([]);
+    setError('');
+  }, []);
+
+  const handleAddExpense = useCallback(async (expense: Expense) => {
+    setError('');
+    setIsCreating(true);
+
+    try {
+      const createdExpense = await createExpense({
+        amount: expense.amount,
+        category: expense.category,
+        description: expense.description,
+        date: expense.date,
+      });
+
+      setExpenses((currentExpenses) => [
+        createdExpense,
+        ...currentExpenses,
+      ]);
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Failed to create expense.',
+      );
+    } finally {
+      setIsCreating(false);
     }
-  }, [expenses, isLoading]);
-
-  const handleAddExpense = useCallback((expense: Expense) => {
-    setExpenses((currentExpenses) => [...currentExpenses, expense]);
   }, []);
+
+  if (!isAuthenticated) {
+    return (
+      <main className="app">
+        <Auth onAuthenticated={handleAuthenticated} />
+      </main>
+    );
+  }
 
   return (
     <main className="app">
       <section className="expense-tracker">
         <header className="expense-tracker__header">
-          <p className="expense-tracker__eyebrow">Personal finance</p>
-          <h1>Expense Tracker</h1>
-          <p className="expense-tracker__description">
-            Keep track of your everyday expenses in one place.
-          </p>
+          <div>
+            <p className="expense-tracker__eyebrow">Personal finance</p>
+            <h1>Expense Tracker</h1>
+            <p className="expense-tracker__description">
+              Keep track of your everyday expenses in one place.
+            </p>
+          </div>
+
+          <div className="expense-tracker__account">
+            {userEmail && <span>{userEmail}</span>}
+            <button type="button" onClick={handleLogout}>
+              Log Out
+            </button>
+          </div>
         </header>
 
-        <ExpenseForm onAddExpense={handleAddExpense} />
+        <ExpenseForm
+          onAddExpense={handleAddExpense}
+          isSubmitting={isCreating}
+        />
 
         {isLoading && (
           <p className="expense-status" role="status">
