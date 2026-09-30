@@ -212,3 +212,32 @@
   font-size: 1rem;
   color: #111827;
 }
+
+.expense-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 24px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+}
+
+.expense-summary__label {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+  color: #6b7280;
+}
+
+.expense-summary__amount,
+.expense-summary__count {
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+@media (max-width: 600px) {
+  .expense-summary {
+    grid-template-columns: 1fr;
+  }
+}
