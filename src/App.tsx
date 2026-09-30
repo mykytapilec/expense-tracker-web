@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { fetchExpenses } from './api/expenses';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
 import type { Expense } from './types/expense';
@@ -6,6 +7,23 @@ import './App.css';
 
 function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const loadExpenses = async () => {
+      try {
+        const data = await fetchExpenses();
+        setExpenses(data);
+      } catch {
+        setError('Failed to load expenses.');
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadExpenses();
+  }, []);
 
   const handleAddExpense = (expense: Expense) => {
     setExpenses((currentExpenses) => [...currentExpenses, expense]);
@@ -23,7 +41,10 @@ function App() {
         </header>
 
         <ExpenseForm onAddExpense={handleAddExpense} />
-        <ExpenseList expenses={expenses} />
+
+        {isLoading && <p>Loading expenses...</p>}
+        {error && <p>{error}</p>}
+        {!isLoading && !error && <ExpenseList expenses={expenses} />}
       </section>
     </main>
   );
