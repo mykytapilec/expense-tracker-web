@@ -43,8 +43,18 @@ function App() {
 
         <ExpenseForm onAddExpense={handleAddExpense} />
 
-        {isLoading && <p>Loading expenses...</p>}
-        {error && <p>{error}</p>}
+        {isLoading && (
+          <p className="expense-status" role="status">
+            Loading expenses...
+          </p>
+        )}
+
+        {error && (
+          <p className="expense-status expense-status--error" role="alert">
+            {error}
+          </p>
+        )}
+
         {!isLoading && !error && (
           <>
             <ExpenseSummary expenses={expenses} />
