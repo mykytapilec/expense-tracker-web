@@ -1,10 +1,14 @@
-import './App.css';
+import { useState } from 'react';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
+import { ExpenseList } from './components/ExpenseList/ExpenseList';
 import type { Expense } from './types/expense';
+import './App.css';
 
 function App() {
+  const [expenses, setExpenses] = useState<Expense[]>([]);
+
   const handleAddExpense = (expense: Expense) => {
-    console.log('Expense added:', expense);
+    setExpenses((currentExpenses) => [...currentExpenses, expense]);
   };
 
   return (
@@ -19,6 +23,7 @@ function App() {
         </header>
 
         <ExpenseForm onAddExpense={handleAddExpense} />
+        <ExpenseList expenses={expenses} />
       </section>
     </main>
   );
