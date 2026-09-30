@@ -3,29 +3,34 @@ import type { FormEvent } from 'react';
 import type { Expense, ExpenseCategory } from '../../types/expense';
 
 interface ExpenseFormProps {
-  onAddExpense: (expense: Expense) => void;
+  onAddExpense: (expense: Expense) => Promise<void>;
+  isSubmitting: boolean;
 }
 
 const categories: ExpenseCategory[] = [
-  'Food',
-  'Transport',
-  'Entertainment',
-  'Shopping',
-  'Bills',
-  'Other',
+  'GROCERIES',
+  'LEISURE',
+  'ELECTRONICS',
+  'UTILITIES',
+  'CLOTHING',
+  'HEALTH',
+  'OTHERS',
 ];
 
-export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
+export function ExpenseForm({
+  onAddExpense,
+  isSubmitting,
+}: ExpenseFormProps) {
   const descriptionInputRef = useRef<HTMLInputElement>(null);
 
   const [description, setDescription] = useState('');
   const [amount, setAmount] = useState('');
-  const [category, setCategory] = useState<ExpenseCategory>('Other');
+  const [category, setCategory] = useState<ExpenseCategory>('OTHERS');
   const [date, setDate] = useState(
     () => new Date().toISOString().split('T')[0],
   );
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const parsedAmount = Number(amount);
@@ -35,18 +40,18 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
     }
 
     const expense: Expense = {
-      id: crypto.randomUUID(),
+      id: '',
       description: description.trim(),
       amount: parsedAmount,
       category,
       date,
     };
 
-    onAddExpense(expense);
+    await onAddExpense(expense);
 
     setDescription('');
     setAmount('');
-    setCategory('Other');
+    setCategory('OTHERS');
     setDate(new Date().toISOString().split('T')[0]);
 
     descriptionInputRef.current?.focus();
@@ -66,6 +71,7 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
             onChange={(event) => setDescription(event.target.value)}
             placeholder="Enter expense description"
             required
+            disabled={isSubmitting}
           />
         </div>
 
@@ -83,6 +89,7 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
               onChange={(event) => setAmount(event.target.value)}
               placeholder="0.00"
               required
+              disabled={isSubmitting}
             />
           </div>
         </div>
@@ -96,6 +103,7 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
             onChange={(event) =>
               setCategory(event.target.value as ExpenseCategory)
             }
+            disabled={isSubmitting}
           >
             {categories.map((item) => (
               <option key={item} value={item}>
@@ -114,12 +122,17 @@ export function ExpenseForm({ onAddExpense }: ExpenseFormProps) {
             value={date}
             onChange={(event) => setDate(event.target.value)}
             required
+            disabled={isSubmitting}
           />
         </div>
       </div>
 
-      <button className="expense-form__submit" type="submit">
-        Add Expense
+      <button
+        className="expense-form__submit"
+        type="submit"
+        disabled={isSubmitting}
+      >
+        {isSubmitting ? 'Adding Expense...' : 'Add Expense'}
       </button>
     </form>
   );

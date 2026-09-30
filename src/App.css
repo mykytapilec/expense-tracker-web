@@ -257,3 +257,58 @@
   background: #fef2f2;
   color: #b91c1c;
 }
+
+.expense-tracker__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.expense-tracker__account {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
+.expense-tracker__account span {
+  max-width: 240px;
+  overflow: hidden;
+  color: #6b7280;
+  font-size: 0.9rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expense-tracker__account button {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.expense-tracker__account button:hover {
+  background: #f9fafb;
+}
+
+@media (max-width: 600px) {
+  .expense-tracker__header {
+    flex-direction: column;
+  }
+
+  .expense-tracker__account {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .expense-tracker__account span {
+    max-width: calc(100% - 90px);
+  }
+}
