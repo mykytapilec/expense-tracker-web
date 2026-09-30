@@ -241,3 +241,19 @@
     grid-template-columns: 1fr;
   }
 }
+
+.expense-status {
+  margin: 24px 0 0;
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #f9fafb;
+  color: #6b7280;
+  text-align: center;
+}
+
+.expense-status--error {
+  border-color: #fecaca;
+  background: #fef2f2;
+  color: #b91c1c;
+}
