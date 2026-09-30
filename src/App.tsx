@@ -3,6 +3,7 @@ import { fetchExpenses } from './api/expenses';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
 import { ExpenseSummary } from './components/ExpenseSummary/ExpenseSummary';
+import { getStoredExpenses, saveExpenses } from './utils/storage';
 import type { Expense } from './types/expense';
 import './App.css';
 
@@ -13,9 +14,18 @@ function App() {
 
   useEffect(() => {
     const loadExpenses = async () => {
+      const storedExpenses = getStoredExpenses();
+
+      if (storedExpenses) {
+        setExpenses(storedExpenses);
+        setIsLoading(false);
+        return;
+      }
+
       try {
         const data = await fetchExpenses();
         setExpenses(data);
+        saveExpenses(data);
       } catch {
         setError('Failed to load expenses.');
       } finally {
@@ -25,6 +35,12 @@ function App() {
 
     loadExpenses();
   }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      saveExpenses(expenses);
+    }
+  }, [expenses, isLoading]);
 
   const handleAddExpense = useCallback((expense: Expense) => {
     setExpenses((currentExpenses) => [...currentExpenses, expense]);
