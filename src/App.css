@@ -312,3 +312,71 @@
     max-width: calc(100% - 90px);
   }
 }
+
+.expense-item--editing {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+}
+
+.expense-item__edit-fields {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.expense-item__edit-fields input,
+.expense-item__edit-fields select {
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+}
+
+.expense-item__actions {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.expense-item__actions button {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.expense-item__actions button:hover:not(:disabled) {
+  background: #f9fafb;
+}
+
+.expense-item__actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (max-width: 700px) {
+  .expense-item__edit-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .expense-item__actions {
+    margin-left: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .expense-item__edit-fields {
+    grid-template-columns: 1fr;
+  }
+}

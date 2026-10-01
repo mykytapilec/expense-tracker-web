@@ -1,7 +1,12 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import { getToken, removeToken } from './api/auth';
-import { createExpense, fetchExpenses } from './api/expenses';
+import {
+  createExpense,
+  deleteExpense,
+  fetchExpenses,
+  updateExpense,
+} from './api/expenses';
 import { Auth } from './components/Auth/Auth';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
@@ -84,6 +89,54 @@ function App() {
     }
   }, []);
 
+  const handleUpdateExpense = useCallback(
+    async (id: string, expense: Omit<Expense, 'id'>) => {
+      setError('');
+
+      try {
+        const updatedExpense = await updateExpense(id, {
+          amount: expense.amount,
+          category: expense.category,
+          description: expense.description,
+          date: expense.date,
+        });
+
+        setExpenses((currentExpenses) =>
+          currentExpenses.map((currentExpense) =>
+            currentExpense.id === id ? updatedExpense : currentExpense,
+          ),
+        );
+      } catch (requestError) {
+        setError(
+          requestError instanceof Error
+            ? requestError.message
+            : 'Failed to update expense.',
+        );
+        throw requestError;
+      }
+    },
+    [],
+  );
+
+  const handleDeleteExpense = useCallback(async (id: string) => {
+    setError('');
+
+    try {
+      await deleteExpense(id);
+
+      setExpenses((currentExpenses) =>
+        currentExpenses.filter((expense) => expense.id !== id),
+      );
+    } catch (requestError) {
+      setError(
+        requestError instanceof Error
+          ? requestError.message
+          : 'Failed to delete expense.',
+      );
+      throw requestError;
+    }
+  }, []);
+
   if (!isAuthenticated) {
     return (
       <main className="app">
@@ -132,7 +185,11 @@ function App() {
         {!isLoading && !error && (
           <>
             <ExpenseSummary expenses={expenses} />
-            <ExpenseList expenses={expenses} />
+            <ExpenseList
+              expenses={expenses}
+              onUpdateExpense={handleUpdateExpense}
+              onDeleteExpense={handleDeleteExpense}
+            />
           </>
         )}
       </section>
