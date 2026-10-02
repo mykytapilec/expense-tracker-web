@@ -19,6 +19,13 @@ export interface ExpenseSummary {
   total: number;
 }
 
+export interface ExpensesPage {
+  page: number;
+  limit: number;
+  total: number;
+  data: Expense[];
+}
+
 interface ExpenseResponse {
   id: string;
   amount: number;
@@ -66,8 +73,13 @@ function mapExpense(expense: ExpenseResponse): Expense {
 
 export async function fetchExpenses(
   filters: ExpenseFilters = {},
-): Promise<Expense[]> {
+  page = 1,
+  limit = 10,
+): Promise<ExpensesPage> {
   const searchParams = new URLSearchParams();
+
+  searchParams.set('page', String(page));
+  searchParams.set('limit', String(limit));
 
   if (filters.category) {
     searchParams.set('category', filters.category);
@@ -81,14 +93,12 @@ export async function fetchExpenses(
     searchParams.set('endDate', filters.endDate);
   }
 
-  const query = searchParams.toString();
-  const url = query
-    ? `${API_URL}/expenses?${query}`
-    : `${API_URL}/expenses`;
-
-  const response = await fetch(url, {
-    headers: getAuthHeaders(),
-  });
+  const response = await fetch(
+    `${API_URL}/expenses?${searchParams.toString()}`,
+    {
+      headers: getAuthHeaders(),
+    },
+  );
 
   if (!response.ok) {
     const error = await response.json();
@@ -97,7 +107,12 @@ export async function fetchExpenses(
 
   const result: ExpensesResponse = await response.json();
 
-  return result.data.map(mapExpense);
+  return {
+    page: result.page,
+    limit: result.limit,
+    total: result.total,
+    data: result.data.map(mapExpense),
+  };
 }
 
 export async function fetchExpenseStats(): Promise<ExpenseStatsItem[]> {

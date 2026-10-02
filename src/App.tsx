@@ -32,12 +32,17 @@ function App() {
   );
   const [userEmail, setUserEmail] = useState('');
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalExpenses, setTotalExpenses] = useState(0);
+  const [pageSize] = useState(10);
   const [isLoading, setIsLoading] = useState(() => getToken() !== null);
   const [isCreating, setIsCreating] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
   const [filters, setFilters] = useState<ExpenseFiltersState>({});
   const [dashboardMonth, setDashboardMonth] = useState(getCurrentMonth);
   const [error, setError] = useState('');
+
+  const totalPages = Math.ceil(totalExpenses / pageSize);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -46,8 +51,10 @@ function App() {
 
     const loadExpenses = async () => {
       try {
-        const data = await fetchExpenses(filters);
-        setExpenses(data);
+        const result = await fetchExpenses(filters, currentPage, pageSize);
+
+        setExpenses(result.data);
+        setTotalExpenses(result.total);
       } catch (requestError) {
         setError(
           requestError instanceof Error
@@ -61,7 +68,7 @@ function App() {
     };
 
     loadExpenses();
-  }, [isAuthenticated, filters]);
+  }, [isAuthenticated, filters, currentPage, pageSize]);
 
   const handleAuthenticated = useCallback((email: string) => {
     setUserEmail(email);
@@ -75,6 +82,8 @@ function App() {
     setIsAuthenticated(false);
     setUserEmail('');
     setExpenses([]);
+    setCurrentPage(1);
+    setTotalExpenses(0);
     setFilters({});
     setError('');
   }, []);
@@ -95,6 +104,7 @@ function App() {
         createdExpense,
         ...currentExpenses,
       ]);
+      setTotalExpenses((currentTotal) => currentTotal + 1);
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -144,6 +154,7 @@ function App() {
       setExpenses((currentExpenses) =>
         currentExpenses.filter((expense) => expense.id !== id),
       );
+      setTotalExpenses((currentTotal) => Math.max(0, currentTotal - 1));
     } catch (requestError) {
       setError(
         requestError instanceof Error
@@ -159,6 +170,7 @@ function App() {
       setError('');
       setIsFiltering(true);
       setIsLoading(true);
+      setCurrentPage(1);
       setFilters(nextFilters);
     },
     [],
@@ -168,8 +180,17 @@ function App() {
     setError('');
     setIsFiltering(true);
     setIsLoading(true);
+    setCurrentPage(1);
     setFilters({});
   }, []);
+
+  const handlePreviousPage = useCallback(() => {
+    setCurrentPage((page) => Math.max(1, page - 1));
+  }, []);
+
+  const handleNextPage = useCallback(() => {
+    setCurrentPage((page) => Math.min(totalPages, page + 1));
+  }, [totalPages]);
 
   if (!isAuthenticated) {
     return (
@@ -199,9 +220,7 @@ function App() {
           </div>
         </header>
 
-        <ExpenseDashboard
-          month={dashboardMonth}
-        />
+        <ExpenseDashboard month={dashboardMonth} />
 
         <div className="expense-dashboard__month-control">
           <label htmlFor="dashboard-month">Dashboard month</label>
@@ -245,6 +264,30 @@ function App() {
               onUpdateExpense={handleUpdateExpense}
               onDeleteExpense={handleDeleteExpense}
             />
+
+            {totalPages > 1 && (
+              <nav className="expense-pagination" aria-label="Expenses pagination">
+                <button
+                  type="button"
+                  onClick={handlePreviousPage}
+                  disabled={currentPage === 1 || isLoading}
+                >
+                  Previous
+                </button>
+
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleNextPage}
+                  disabled={currentPage === totalPages || isLoading}
+                >
+                  Next
+                </button>
+              </nav>
+            )}
           </>
         )}
       </section>
