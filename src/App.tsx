@@ -8,6 +8,7 @@ import {
   updateExpense,
 } from './api/expenses';
 import { Auth } from './components/Auth/Auth';
+import { ExpenseDashboard } from './components/ExpenseDashboard/ExpenseDashboard';
 import { ExpenseFilters } from './components/ExpenseFilters/ExpenseFilters';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
@@ -21,6 +22,10 @@ interface ExpenseFiltersState {
   endDate?: string;
 }
 
+function getCurrentMonth(): string {
+  return new Date().toISOString().slice(0, 7);
+}
+
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => getToken() !== null,
@@ -31,6 +36,7 @@ function App() {
   const [isCreating, setIsCreating] = useState(false);
   const [isFiltering, setIsFiltering] = useState(false);
   const [filters, setFilters] = useState<ExpenseFiltersState>({});
+  const [dashboardMonth, setDashboardMonth] = useState(getCurrentMonth);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -192,6 +198,20 @@ function App() {
             </button>
           </div>
         </header>
+
+        <ExpenseDashboard
+          month={dashboardMonth}
+        />
+
+        <div className="expense-dashboard__month-control">
+          <label htmlFor="dashboard-month">Dashboard month</label>
+          <input
+            id="dashboard-month"
+            type="month"
+            value={dashboardMonth}
+            onChange={(event) => setDashboardMonth(event.target.value)}
+          />
+        </div>
 
         <ExpenseForm
           onAddExpense={handleAddExpense}
