@@ -627,3 +627,60 @@
     flex-direction: column;
   }
 }
+
+.expense-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 16px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.expense-pagination button {
+  min-width: 88px;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #374151;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.expense-pagination button:hover:not(:disabled) {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.expense-pagination button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.expense-pagination span {
+  min-width: 100px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+@media (max-width: 500px) {
+  .expense-pagination {
+    gap: 8px;
+  }
+
+  .expense-pagination button {
+    min-width: 80px;
+    padding: 0 10px;
+  }
+
+  .expense-pagination span {
+    min-width: 90px;
+  }
+}
