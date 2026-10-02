@@ -3,6 +3,12 @@ import type { Expense, ExpenseCategory } from '../types/expense';
 
 const API_URL = 'http://localhost:3000';
 
+export interface ExpenseFilters {
+  category?: ExpenseCategory;
+  startDate?: string;
+  endDate?: string;
+}
+
 interface ExpenseResponse {
   id: string;
   amount: number;
@@ -48,8 +54,29 @@ function mapExpense(expense: ExpenseResponse): Expense {
   };
 }
 
-export async function fetchExpenses(): Promise<Expense[]> {
-  const response = await fetch(`${API_URL}/expenses`, {
+export async function fetchExpenses(
+  filters: ExpenseFilters = {},
+): Promise<Expense[]> {
+  const searchParams = new URLSearchParams();
+
+  if (filters.category) {
+    searchParams.set('category', filters.category);
+  }
+
+  if (filters.startDate) {
+    searchParams.set('startDate', filters.startDate);
+  }
+
+  if (filters.endDate) {
+    searchParams.set('endDate', filters.endDate);
+  }
+
+  const query = searchParams.toString();
+  const url = query
+    ? `${API_URL}/expenses?${query}`
+    : `${API_URL}/expenses`;
+
+  const response = await fetch(url, {
     headers: getAuthHeaders(),
   });
 

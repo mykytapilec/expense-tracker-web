@@ -8,11 +8,18 @@ import {
   updateExpense,
 } from './api/expenses';
 import { Auth } from './components/Auth/Auth';
+import { ExpenseFilters } from './components/ExpenseFilters/ExpenseFilters';
 import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList/ExpenseList';
 import { ExpenseSummary } from './components/ExpenseSummary/ExpenseSummary';
-import type { Expense } from './types/expense';
+import type { Expense, ExpenseCategory } from './types/expense';
 import './App.css';
+
+interface ExpenseFiltersState {
+  category?: ExpenseCategory;
+  startDate?: string;
+  endDate?: string;
+}
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
@@ -22,6 +29,8 @@ function App() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [isLoading, setIsLoading] = useState(() => getToken() !== null);
   const [isCreating, setIsCreating] = useState(false);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [filters, setFilters] = useState<ExpenseFiltersState>({});
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -31,7 +40,7 @@ function App() {
 
     const loadExpenses = async () => {
       try {
-        const data = await fetchExpenses();
+        const data = await fetchExpenses(filters);
         setExpenses(data);
       } catch (requestError) {
         setError(
@@ -41,11 +50,12 @@ function App() {
         );
       } finally {
         setIsLoading(false);
+        setIsFiltering(false);
       }
     };
 
     loadExpenses();
-  }, [isAuthenticated]);
+  }, [isAuthenticated, filters]);
 
   const handleAuthenticated = useCallback((email: string) => {
     setUserEmail(email);
@@ -59,6 +69,7 @@ function App() {
     setIsAuthenticated(false);
     setUserEmail('');
     setExpenses([]);
+    setFilters({});
     setError('');
   }, []);
 
@@ -137,6 +148,23 @@ function App() {
     }
   }, []);
 
+  const handleApplyFilters = useCallback(
+    (nextFilters: ExpenseFiltersState) => {
+      setError('');
+      setIsFiltering(true);
+      setIsLoading(true);
+      setFilters(nextFilters);
+    },
+    [],
+  );
+
+  const handleClearFilters = useCallback(() => {
+    setError('');
+    setIsFiltering(true);
+    setIsLoading(true);
+    setFilters({});
+  }, []);
+
   if (!isAuthenticated) {
     return (
       <main className="app">
@@ -170,6 +198,12 @@ function App() {
           isSubmitting={isCreating}
         />
 
+        <ExpenseFilters
+          onApply={handleApplyFilters}
+          onClear={handleClearFilters}
+          isLoading={isFiltering}
+        />
+
         {isLoading && (
           <p className="expense-status" role="status">
             Loading expenses...
@@ -185,6 +219,7 @@ function App() {
         {!isLoading && !error && (
           <>
             <ExpenseSummary expenses={expenses} />
+
             <ExpenseList
               expenses={expenses}
               onUpdateExpense={handleUpdateExpense}
