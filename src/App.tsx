@@ -1,297 +1,86 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
+import {
+  BrowserRouter,
+  Navigate,
+  Route,
+  Routes,
+} from 'react-router-dom';
 
 import { getToken, removeToken } from './api/auth';
-import {
-  createExpense,
-  deleteExpense,
-  fetchExpenses,
-  updateExpense,
-} from './api/expenses';
-import { Auth } from './components/Auth/Auth';
-import { ExpenseDashboard } from './components/ExpenseDashboard/ExpenseDashboard';
-import { ExpenseFilters } from './components/ExpenseFilters/ExpenseFilters';
-import { ExpenseForm } from './components/ExpenseForm/ExpenseForm';
-import { ExpenseList } from './components/ExpenseList/ExpenseList';
-import { ExpenseSummary } from './components/ExpenseSummary/ExpenseSummary';
-import type { Expense, ExpenseCategory } from './types/expense';
+import { AppLayout } from './layouts/AppLayout/AppLayout';
+import { DashboardPage } from './pages/DashboardPage/DashboardPage';
+import { ExpensesPage } from './pages/ExpensesPage/ExpensesPage';
+import { LoginPage } from './pages/LoginPage/LoginPage';
 import './App.css';
-
-interface ExpenseFiltersState {
-  category?: ExpenseCategory;
-  startDate?: string;
-  endDate?: string;
-}
-
-function getCurrentMonth(): string {
-  return new Date().toISOString().slice(0, 7);
-}
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => getToken() !== null,
   );
   const [userEmail, setUserEmail] = useState('');
-  const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalExpenses, setTotalExpenses] = useState(0);
-  const [pageSize] = useState(10);
-  const [isLoading, setIsLoading] = useState(() => getToken() !== null);
-  const [isCreating, setIsCreating] = useState(false);
-  const [isFiltering, setIsFiltering] = useState(false);
-  const [filters, setFilters] = useState<ExpenseFiltersState>({});
-  const [dashboardMonth, setDashboardMonth] = useState(getCurrentMonth);
-  const [error, setError] = useState('');
-
-  const totalPages = Math.ceil(totalExpenses / pageSize);
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      return;
-    }
-
-    const loadExpenses = async () => {
-      try {
-        const result = await fetchExpenses(filters, currentPage, pageSize);
-
-        setExpenses(result.data);
-        setTotalExpenses(result.total);
-      } catch (requestError) {
-        setError(
-          requestError instanceof Error
-            ? requestError.message
-            : 'Failed to load expenses.',
-        );
-      } finally {
-        setIsLoading(false);
-        setIsFiltering(false);
-      }
-    };
-
-    loadExpenses();
-  }, [isAuthenticated, filters, currentPage, pageSize]);
 
   const handleAuthenticated = useCallback((email: string) => {
     setUserEmail(email);
     setIsAuthenticated(true);
-    setIsLoading(true);
-    setError('');
   }, []);
 
   const handleLogout = useCallback(() => {
     removeToken();
     setIsAuthenticated(false);
     setUserEmail('');
-    setExpenses([]);
-    setCurrentPage(1);
-    setTotalExpenses(0);
-    setFilters({});
-    setError('');
   }, []);
-
-  const handleAddExpense = useCallback(async (expense: Expense) => {
-    setError('');
-    setIsCreating(true);
-
-    try {
-      const createdExpense = await createExpense({
-        amount: expense.amount,
-        category: expense.category,
-        description: expense.description,
-        date: expense.date,
-      });
-
-      setExpenses((currentExpenses) => [
-        createdExpense,
-        ...currentExpenses,
-      ]);
-      setTotalExpenses((currentTotal) => currentTotal + 1);
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : 'Failed to create expense.',
-      );
-    } finally {
-      setIsCreating(false);
-    }
-  }, []);
-
-  const handleUpdateExpense = useCallback(
-    async (id: string, expense: Omit<Expense, 'id'>) => {
-      setError('');
-
-      try {
-        const updatedExpense = await updateExpense(id, {
-          amount: expense.amount,
-          category: expense.category,
-          description: expense.description,
-          date: expense.date,
-        });
-
-        setExpenses((currentExpenses) =>
-          currentExpenses.map((currentExpense) =>
-            currentExpense.id === id ? updatedExpense : currentExpense,
-          ),
-        );
-      } catch (requestError) {
-        setError(
-          requestError instanceof Error
-            ? requestError.message
-            : 'Failed to update expense.',
-        );
-        throw requestError;
-      }
-    },
-    [],
-  );
-
-  const handleDeleteExpense = useCallback(async (id: string) => {
-    setError('');
-
-    try {
-      await deleteExpense(id);
-
-      setExpenses((currentExpenses) =>
-        currentExpenses.filter((expense) => expense.id !== id),
-      );
-      setTotalExpenses((currentTotal) => Math.max(0, currentTotal - 1));
-    } catch (requestError) {
-      setError(
-        requestError instanceof Error
-          ? requestError.message
-          : 'Failed to delete expense.',
-      );
-      throw requestError;
-    }
-  }, []);
-
-  const handleApplyFilters = useCallback(
-    (nextFilters: ExpenseFiltersState) => {
-      setError('');
-      setIsFiltering(true);
-      setIsLoading(true);
-      setCurrentPage(1);
-      setFilters(nextFilters);
-    },
-    [],
-  );
-
-  const handleClearFilters = useCallback(() => {
-    setError('');
-    setIsFiltering(true);
-    setIsLoading(true);
-    setCurrentPage(1);
-    setFilters({});
-  }, []);
-
-  const handlePreviousPage = useCallback(() => {
-    setCurrentPage((page) => Math.max(1, page - 1));
-  }, []);
-
-  const handleNextPage = useCallback(() => {
-    setCurrentPage((page) => Math.min(totalPages, page + 1));
-  }, [totalPages]);
-
-  if (!isAuthenticated) {
-    return (
-      <main className="app">
-        <Auth onAuthenticated={handleAuthenticated} />
-      </main>
-    );
-  }
 
   return (
-    <main className="app">
-      <section className="expense-tracker">
-        <header className="expense-tracker__header">
-          <div>
-            <p className="expense-tracker__eyebrow">Personal finance</p>
-            <h1>Expense Tracker</h1>
-            <p className="expense-tracker__description">
-              Keep track of your everyday expenses in one place.
-            </p>
-          </div>
+    <BrowserRouter>
+      <Routes>
+        <Route
+          path="/login"
+          element={
+            isAuthenticated ? (
+              <Navigate to="/dashboard" replace />
+            ) : (
+              <main className="app">
+                <LoginPage
+                  onAuthenticated={handleAuthenticated}
+                />
+              </main>
+            )
+          }
+        />
 
-          <div className="expense-tracker__account">
-            {userEmail && <span>{userEmail}</span>}
-            <button type="button" onClick={handleLogout}>
-              Log Out
-            </button>
-          </div>
-        </header>
-
-        <ExpenseDashboard month={dashboardMonth} />
-
-        <div className="expense-dashboard__month-control">
-          <label htmlFor="dashboard-month">Dashboard month</label>
-          <input
-            id="dashboard-month"
-            type="month"
-            value={dashboardMonth}
-            onChange={(event) => setDashboardMonth(event.target.value)}
+        <Route
+          element={
+            isAuthenticated ? (
+              <AppLayout
+                userEmail={userEmail}
+                onLogout={handleLogout}
+              />
+            ) : (
+              <Navigate to="/login" replace />
+            )
+          }
+        >
+          <Route
+            path="/dashboard"
+            element={<DashboardPage />}
           />
-        </div>
+          <Route
+            path="/expenses"
+            element={<ExpensesPage />}
+          />
+        </Route>
 
-        <ExpenseForm
-          onAddExpense={handleAddExpense}
-          isSubmitting={isCreating}
-        />
-
-        <ExpenseFilters
-          onApply={handleApplyFilters}
-          onClear={handleClearFilters}
-          isLoading={isFiltering}
-        />
-
-        {isLoading && (
-          <p className="expense-status" role="status">
-            Loading expenses...
-          </p>
-        )}
-
-        {error && (
-          <p className="expense-status expense-status--error" role="alert">
-            {error}
-          </p>
-        )}
-
-        {!isLoading && !error && (
-          <>
-            <ExpenseSummary expenses={expenses} />
-
-            <ExpenseList
-              expenses={expenses}
-              onUpdateExpense={handleUpdateExpense}
-              onDeleteExpense={handleDeleteExpense}
+        <Route
+          path="*"
+          element={
+            <Navigate
+              to={isAuthenticated ? '/dashboard' : '/login'}
+              replace
             />
-
-            {totalPages > 1 && (
-              <nav className="expense-pagination" aria-label="Expenses pagination">
-                <button
-                  type="button"
-                  onClick={handlePreviousPage}
-                  disabled={currentPage === 1 || isLoading}
-                >
-                  Previous
-                </button>
-
-                <span>
-                  Page {currentPage} of {totalPages}
-                </span>
-
-                <button
-                  type="button"
-                  onClick={handleNextPage}
-                  disabled={currentPage === totalPages || isLoading}
-                >
-                  Next
-                </button>
-              </nav>
-            )}
-          </>
-        )}
-      </section>
-    </main>
+          }
+        />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
