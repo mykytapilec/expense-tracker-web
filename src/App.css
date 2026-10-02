@@ -469,3 +469,161 @@
     grid-column: auto;
   }
 }
+
+.expense-dashboard {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+}
+
+.expense-dashboard__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.expense-dashboard__eyebrow {
+  margin: 0 0 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #6b7280;
+}
+
+.expense-dashboard__header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: #111827;
+}
+
+.expense-dashboard__month {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.expense-dashboard__summary {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.expense-dashboard__card {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f9fafb;
+}
+
+.expense-dashboard__card-label {
+  display: block;
+  margin-bottom: 6px;
+  color: #6b7280;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.expense-dashboard__card-value {
+  display: block;
+  color: #111827;
+  font-size: 1.5rem;
+}
+
+.expense-dashboard__sections {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+.expense-dashboard__section {
+  min-width: 0;
+}
+
+.expense-dashboard__section h3 {
+  margin: 0 0 12px;
+  color: #111827;
+  font-size: 0.95rem;
+}
+
+.expense-dashboard__list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.expense-dashboard__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: #f9fafb;
+  color: #374151;
+  font-size: 0.85rem;
+}
+
+.expense-dashboard__row strong {
+  color: #111827;
+  white-space: nowrap;
+}
+
+.expense-dashboard__empty {
+  margin: 0;
+  color: #6b7280;
+  font-size: 0.85rem;
+}
+
+.expense-dashboard__month-control {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.expense-dashboard__month-control label {
+  color: #374151;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.expense-dashboard__month-control input {
+  min-height: 40px;
+  box-sizing: border-box;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+  color: #111827;
+  font: inherit;
+}
+
+@media (max-width: 700px) {
+  .expense-dashboard__sections {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 500px) {
+  .expense-dashboard__summary {
+    grid-template-columns: 1fr;
+  }
+
+  .expense-dashboard__header {
+    flex-direction: column;
+  }
+
+  .expense-dashboard__month-control {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

@@ -9,6 +9,16 @@ export interface ExpenseFilters {
   endDate?: string;
 }
 
+export interface ExpenseStatsItem {
+  category: ExpenseCategory;
+  total: number;
+}
+
+export interface ExpenseSummary {
+  month: string;
+  total: number;
+}
+
 interface ExpenseResponse {
   id: string;
   amount: number;
@@ -88,6 +98,65 @@ export async function fetchExpenses(
   const result: ExpensesResponse = await response.json();
 
   return result.data.map(mapExpense);
+}
+
+export async function fetchExpenseStats(): Promise<ExpenseStatsItem[]> {
+  const response = await fetch(`${API_URL}/expenses/stats`, {
+    headers: getAuthHeaders(),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to load expense statistics.');
+  }
+
+  return response.json();
+}
+
+export async function fetchExpenseSummary(
+  month: string,
+): Promise<ExpenseSummary> {
+  const searchParams = new URLSearchParams({
+    month,
+  });
+
+  const response = await fetch(
+    `${API_URL}/expenses/summary?${searchParams.toString()}`,
+    {
+      headers: getAuthHeaders(),
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || 'Failed to load expense summary.');
+  }
+
+  return response.json();
+}
+
+export async function fetchTopExpenseCategories(
+  limit = 5,
+): Promise<ExpenseStatsItem[]> {
+  const searchParams = new URLSearchParams({
+    limit: String(limit),
+  });
+
+  const response = await fetch(
+    `${API_URL}/expenses/top-categories?${searchParams.toString()}`,
+    {
+      headers: getAuthHeaders(),
+    },
+  );
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(
+      error.message || 'Failed to load top expense categories.',
+    );
+  }
+
+  return response.json();
 }
 
 export async function createExpense(
