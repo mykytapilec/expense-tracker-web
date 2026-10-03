@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { NavLink, Outlet } from 'react-router-dom';
 
 interface AppLayoutProps {
   userEmail: string;
@@ -29,6 +29,30 @@ export function AppLayout({
             </button>
           </div>
         </header>
+
+        <nav className="app-navigation" aria-label="Main navigation">
+          <NavLink
+            to="/dashboard"
+            className={({ isActive }) =>
+              isActive
+                ? 'app-navigation__link app-navigation__link--active'
+                : 'app-navigation__link'
+            }
+          >
+            Dashboard
+          </NavLink>
+
+          <NavLink
+            to="/expenses"
+            className={({ isActive }) =>
+              isActive
+                ? 'app-navigation__link app-navigation__link--active'
+                : 'app-navigation__link'
+            }
+          >
+            Expenses
+          </NavLink>
+        </nav>
 
         <Outlet />
       </section>
