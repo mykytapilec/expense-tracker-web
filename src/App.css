@@ -684,3 +684,46 @@
     min-width: 90px;
   }
 }
+
+.app-navigation {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.app-navigation__link {
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #6b7280;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.app-navigation__link:hover {
+  background: #f9fafb;
+  color: #374151;
+}
+
+.app-navigation__link--active {
+  background: #111827;
+  color: #ffffff;
+}
+
+.app-navigation__link--active:hover {
+  background: #111827;
+  color: #ffffff;
+}
+
+@media (max-width: 500px) {
+  .app-navigation {
+    gap: 4px;
+  }
+
+  .app-navigation__link {
+    flex: 1;
+    text-align: center;
+  }
+}
