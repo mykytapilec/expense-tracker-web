@@ -6,7 +6,12 @@ import {
   Routes,
 } from 'react-router-dom';
 
-import { getToken, removeToken } from './api/auth';
+import {
+  getToken,
+  getUserEmail,
+  removeToken,
+  removeUserEmail,
+} from './api/auth';
 import { AppLayout } from './layouts/AppLayout/AppLayout';
 import { DashboardPage } from './pages/DashboardPage/DashboardPage';
 import { ExpensesPage } from './pages/ExpensesPage/ExpensesPage';
@@ -17,7 +22,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(
     () => getToken() !== null,
   );
-  const [userEmail, setUserEmail] = useState('');
+  const [userEmail, setUserEmail] = useState(getUserEmail);
 
   const handleAuthenticated = useCallback((email: string) => {
     setUserEmail(email);
@@ -26,6 +31,7 @@ function App() {
 
   const handleLogout = useCallback(() => {
     removeToken();
+    removeUserEmail();
     setIsAuthenticated(false);
     setUserEmail('');
   }, []);
