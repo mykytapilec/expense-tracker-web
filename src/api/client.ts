@@ -1,4 +1,4 @@
-import { getToken } from './auth';
+import { clearAuthStorage, getToken } from './auth-storage';
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -26,6 +26,14 @@ async function parseError(response: Response): Promise<string> {
   }
 
   return `Request failed with status ${response.status}.`;
+}
+
+function handleUnauthorized(): void {
+  clearAuthStorage();
+
+  if (window.location.pathname !== '/login') {
+    window.location.assign('/login');
+  }
 }
 
 export async function apiRequest<T>(
@@ -58,6 +66,11 @@ export async function apiRequest<T>(
     ...requestOptions,
     headers,
   });
+
+  if (response.status === 401) {
+    handleUnauthorized();
+    throw new Error('Authentication required.');
+  }
 
   if (!response.ok) {
     throw new Error(await parseError(response));
