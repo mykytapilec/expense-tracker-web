@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL;
+import { apiRequest } from './client';
 
 const AUTH_TOKEN_KEY = 'authToken';
 const AUTH_USER_EMAIL_KEY = 'authUserEmail';
@@ -19,39 +19,21 @@ interface AuthCredentials {
 export async function signup(
   credentials: AuthCredentials,
 ): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/auth/signup`, {
+  return apiRequest<AuthResponse>('/auth/signup', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(credentials),
+    requiresAuth: false,
   });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to sign up.');
-  }
-
-  return response.json();
 }
 
 export async function login(
   credentials: AuthCredentials,
 ): Promise<AuthResponse> {
-  const response = await fetch(`${API_URL}/auth/login`, {
+  return apiRequest<AuthResponse>('/auth/login', {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(credentials),
+    requiresAuth: false,
   });
-
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.message || 'Failed to log in.');
-  }
-
-  return response.json();
 }
 
 export function saveToken(token: string): void {
